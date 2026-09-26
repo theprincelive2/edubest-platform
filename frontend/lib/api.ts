@@ -25,7 +25,8 @@ import { getToken, setToken, clearToken } from "@/lib/auth";
 
 /* ── Environment ─────────────────────────────────────────────────── */
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/v1";
+  process.env.NEXT_PUBLIC_API_URL ??
+  "https://edubest-api-pl2v.onrender.com/api/v1";
 
 /* ── Custom error type ───────────────────────────────────────────── */
 export interface ApiError {
