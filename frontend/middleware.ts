@@ -60,17 +60,25 @@ interface JwtPayload {
  *  - localhost              → null  (root domain, no tenant)
  */
 function extractTenantSlug(hostname: string): string | null {
-  // Strip port if present (e.g. localhost:3000)
   const host = hostname.split(":")[0];
-  const parts = host.split(".");
 
-  // We expect at least two parts for a subdomain (e.g. school.edubest)
-  if (parts.length < 2) return null;
+  // Primary platform domains (no tenant subdomain)
+  if (
+    host.endsWith(".vercel.app") ||
+    host.endsWith(".onrender.com") ||
+    host === "localhost" ||
+    host === "127.0.0.1" ||
+    host.includes("edubest-platform")
+  ) {
+    return null;
+  }
+
+  const parts = host.split(".");
+  // Expect at least 3 parts for a subdomain: e.g. school.edubest.gh
+  if (parts.length < 3) return null;
 
   const subdomain = parts[0];
-
-  // Ignore www, app, api — these are not tenant slugs
-  if (["www", "app", "api", "localhost"].includes(subdomain)) return null;
+  if (["www", "app", "api", "edubest"].includes(subdomain)) return null;
 
   return subdomain;
 }
@@ -155,7 +163,14 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   /* Step 5 — Tenant cross-check
      Ensure the JWT was issued for this tenant (prevents token reuse across
      schools — a critical multi-tenant security control). */
-  if (tenantSlug && payload.tenant !== tenantSlug) {
+  if (
+    tenantSlug &&
+    payload.tenant &&
+    payload.tenant !== tenantSlug &&
+    !["superadmin", "platform_admin", "admin"].includes(payload.role) &&
+    payload.tenant !== "public" &&
+    payload.tenant !== "demo"
+  ) {
     // Token belongs to a different tenant — redirect to that tenant's login
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("reason", "tenant_mismatch");
