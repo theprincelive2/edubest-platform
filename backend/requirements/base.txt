@@ -6,6 +6,7 @@ django-cors-headers==4.3.1
 django-filter==24.2
 django-allauth==0.63.3
 psycopg2-binary==2.9.9
+dj-database-url==2.2.0
 redis==5.0.4
 celery==5.4.0
 django-celery-beat==2.6.0
