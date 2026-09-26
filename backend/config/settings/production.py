@@ -139,20 +139,18 @@ if SENTRY_DSN:
     )
 
 # ---------------------------------------------------------------------------
-# Logging — structured logs for production log aggregator (e.g. CloudWatch)
+# Logging — structured logs for production
 # ---------------------------------------------------------------------------
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
-        "json": {
-            "()": "pythonjsonlogger.jsonlogger.JsonFormatter",
-            "format": "%(asctime)s %(levelname)s %(name)s %(message)s",
-        }
-        if False  # Enable when python-json-logger is installed
-        else "verbose",
         "verbose": {
             "format": "{levelname} {asctime} {module} {message}",
+            "style": "{",
+        },
+        "simple": {
+            "format": "{levelname} {message}",
             "style": "{",
         },
     },
